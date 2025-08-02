@@ -1,0 +1,19 @@
+{
+  "title": "OrgStats",
+  "type": "object",
+  "properties": {
+    "num_events": { "type": "number" },
+    "num_people_helped": { "type": "number" },
+    "total_money_donated": { "type": "number" },
+    "num_projects": { "type": "number" },
+    "primary_color": { "type": "string" },
+    "secondary_color": { "type": "string" }
+  },
+  "required": [
+    "num_events",
+    "num_people_helped",
+    "total_money_donated",
+    "num_projects"
+  ],
+  "additionalProperties": false
+}

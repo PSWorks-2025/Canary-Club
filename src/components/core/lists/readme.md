@@ -1,0 +1,2 @@
+There is no "singular" list that fits all, instead, there will be a few basic lists template we can choose from
+todo: replace these list with list that are more reusable, current reusable lists: vertical and horizontal scroll list
