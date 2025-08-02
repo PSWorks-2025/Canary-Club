@@ -1,1 +1,1 @@
-export const basePath = '/Canary-Charity-Club';
+export const basePath = '/Canary-Club';
