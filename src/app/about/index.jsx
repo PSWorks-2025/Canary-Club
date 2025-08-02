@@ -9,7 +9,7 @@ import TimelineDisplay from '../../components/SectionsModel/AboutCanary/Timeline
 import ProjectHighlightDisplay from '../../components/SectionsModel/AboutCanary/ProjectsHighlight/ProjectsHighlightDisplay';
 
 function Aboutpage() {
-  const { setCurrentPage, heroSections, statements, storyOverviews, members, activityHistory, projectOverviews } =
+  const { setCurrentPage, heroSections, statements, storyOverviews, members, activityHistory, projectOverviews, sectionTitles } =
     useContext(GlobalContext);
 
   useEffect(() => setCurrentPage('about'), [setCurrentPage]);
@@ -32,14 +32,19 @@ function Aboutpage() {
         visionDescription={statements?.vision?.description}
       />
       <StoriesHighlightDisplay
-        title="Các câu chuyện ý nghĩa"
+        title={sectionTitles.stories || 'Những kỉ niệm của chúng tôi'}
         listData={storyOverviews || {}}
       />
-      <MemberListDisplay listData={members || []} />
+      <MemberListDisplay
+        title={sectionTitles.members || 'Thành viên'}
+        listData={members || []}
+      />
       <TimelineDisplay
+        title={sectionTitles.activity_history || 'Lịch sử hoạt động'}
         listData={activityHistory || []}
       />
       <ProjectHighlightDisplay
+        title={sectionTitles.projects || 'Dự án & hoạt động nổi bật đã thực hiện'}
         listData={projectOverviews || {}}
       />
     </div>

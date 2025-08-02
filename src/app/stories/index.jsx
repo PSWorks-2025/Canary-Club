@@ -3,8 +3,9 @@ import GlobalContext from '../../contexts/GlobalContext';
 import './styles.css';
 import StoriesHeroSectionDisplay from '../../components/SectionsModel/Story/HeroSection/StoryHeroSectionDisplay';
 import StoriesListDisplay from '../../components/SectionsModel/Story/StoriesList/StoriesListDisplay';
+
 function StoriesPage() {
-  const { setCurrentPage, heroSections, storyOverviews, secondaryBackgroundColor } = useContext(GlobalContext);
+  const { setCurrentPage, heroSections, storyOverviews, sectionTitles, secondaryBackgroundColor } = useContext(GlobalContext);
 
   useEffect(() => setCurrentPage('stories'), [setCurrentPage]);
 
@@ -18,7 +19,7 @@ function StoriesPage() {
         buttonColor={secondaryBackgroundColor}
       />
       <StoriesListDisplay
-        title="Các câu chuyện ý nghĩa"
+        title={sectionTitles.stories || 'Những kỉ niệm của chúng tôi'}
         listData={storyOverviews || {}}
       />
     </div>

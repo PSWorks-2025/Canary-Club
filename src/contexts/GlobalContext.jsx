@@ -14,12 +14,9 @@ export const GlobalContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Theme colors
-  const [primaryBackgroundColor, setPrimaryBackgroundColor] =
-    useState('#ffffff');
-  const [secondaryBackgroundColor, setSecondaryBackgroundColor] =
-    useState('#4160df');
-  const [tertiaryBackgroundColor, setTertiaryBackgroundColor] =
-    useState('#4160df');
+  const [primaryBackgroundColor, setPrimaryBackgroundColor] = useState('#ffffff');
+  const [secondaryBackgroundColor, setSecondaryBackgroundColor] = useState('#4160df');
+  const [tertiaryBackgroundColor, setTertiaryBackgroundColor] = useState('#4160df');
 
   // Footer-specific states
   const [logoUrl, setLogoUrl] = useState('');
@@ -33,7 +30,7 @@ export const GlobalContextProvider = ({ children }) => {
   });
   const [socialLinksData, setSocialLinksData] = useState({});
 
-  // Image upload queue
+  // Image upload queue (unused in public site but kept for consistency)
   const [imageUploadQueue, setImageUploadQueue] = useState({});
 
   // Main data states for the main pages
@@ -56,10 +53,12 @@ export const GlobalContextProvider = ({ children }) => {
     campaign_details: 'Chi Tiết Chiến Dịch',
     donor_list: 'Danh Sách Ủng Hộ',
     events: 'Sự kiện',
+    donate_overview: 'Hãy đồng hành cùng chúng mình', // Added for DonateOverview
+    events_overview: 'Tổng kết các sự kiện đã qua', // Added for EventsOverview
   });
 
   useEffect(() => {
-    console.log(projectOverviews);
+    console.log('Current projectOverviews:', projectOverviews);
   }, [projectOverviews]);
 
   useEffect(() => {
@@ -69,15 +68,9 @@ export const GlobalContextProvider = ({ children }) => {
         if (res?.global) {
           setGlobalData(res.global);
           setLogoUrl(res.global.logo || '');
-          setPrimaryBackgroundColor(
-            res.global.primaryBackgroundColor || '#ffffff'
-          );
-          setSecondaryBackgroundColor(
-            res.global.secondaryBackgroundColor || '#ffffff'
-          );
-          setTertiaryBackgroundColor(
-            res.global.tertiaryBackgroundColor || '#4160df'
-          );
+          setPrimaryBackgroundColor(res.global.primaryBackgroundColor || '#ffffff');
+          setSecondaryBackgroundColor(res.global.secondaryBackgroundColor || '#4160df');
+          setTertiaryBackgroundColor(res.global.tertiaryBackgroundColor || '#4160df');
           setGroupName(res.global.group_name || '');
           setGroupDescription(res.global.description || '');
           setContactInfoData({
@@ -89,16 +82,65 @@ export const GlobalContextProvider = ({ children }) => {
         }
         if (res?.main) {
           setMainData(res.main);
-          setActivityHistory(res.main.activity_history || []);
-          setEventOverviews(res.main.event_overviews || {});
-          setFundraising(res.main.fundraising || {});
+          setActivityHistory(
+            res.main.activity_history?.map((activity) => ({
+              ...activity,
+              started_time: activity.started_time?.toDate
+                ? activity.started_time.toDate()
+                : activity.started_time || null,
+              ended_time: activity.ended_time?.toDate
+                ? activity.ended_time.toDate()
+                : activity.ended_time || null,
+            })) || []
+          );
+          setEventOverviews(
+            Object.entries(res.main.event_overviews || {}).reduce((acc, [key, event]) => {
+              acc[key] = {
+                ...event,
+                started_time: event.started_time?.toDate
+                  ? event.started_time.toDate()
+                  : event.started_time || null,
+              };
+              return acc;
+            }, {})
+          );
+          setFundraising({
+            ...res.main.fundraising,
+            fundraiser_name: res.main.fundraising?.fundraiser_name || res.main.fundraising?.fundraiserName || '',
+            campaign_title: res.main.fundraising?.campaign_title || res.main.fundraising?.campaignTitle || '',
+            image_url: res.main.fundraising?.image_url || res.main.fundraising?.imageUrl || 'https://via.placeholder.com/300',
+          });
           setHeroSections(res.main.hero_sections || {});
           setHighlights(res.main.highlights || {});
           setMembers(res.main.members || []);
-          setOrgStats(res.main.org_stats || {});
-          setProjectOverviews(res.main.project_overviews || {});
+          setOrgStats({
+            ...res.main.org_stats,
+            primary_color: res.main.org_stats?.primary_color || res.main.org_stats?.primaryColor || '#5900ff',
+            secondary_color: res.main.org_stats?.secondary_color || res.main.org_stats?.secondaryColor || '#ff0000',
+          });
+          setProjectOverviews(
+            Object.entries(res.main.project_overviews || {}).reduce((acc, [key, project]) => {
+              acc[key] = {
+                ...project,
+                started_time: project.started_time?.toDate
+                  ? project.started_time.toDate()
+                  : project.started_time || null,
+              };
+              return acc;
+            }, {})
+          );
           setStatements(res.main.statements || {});
-          setStoryOverviews(res.main.story_overviews || {});
+          setStoryOverviews(
+            Object.entries(res.main.story_overviews || {}).reduce((acc, [key, story]) => {
+              acc[key] = {
+                ...story,
+                posted_time: story.posted_time?.toDate
+                  ? story.posted_time.toDate()
+                  : story.posted_time || null,
+              };
+              return acc;
+            }, {})
+          );
           setSectionTitles({
             members: res.main.section_titles?.members || 'Thành viên',
             activity_history: res.main.section_titles?.activity_history || 'Lịch sử hoạt động',
@@ -108,10 +150,12 @@ export const GlobalContextProvider = ({ children }) => {
             campaign_details: res.main.section_titles?.campaign_details || 'Chi Tiết Chiến Dịch',
             donor_list: res.main.section_titles?.donor_list || 'Danh Sách Ủng Hộ',
             events: res.main.section_titles?.events || 'Sự kiện',
+            donate_overview: res.main.section_titles?.donate_overview || 'Hãy đồng hành cùng chúng mình',
+            events_overview: res.main.section_titles?.events_overview || 'Tổng kết các sự kiện đã qua',
           });
         }
       } catch (error) {
-        console.error('Error in GlobalProvider useEffect:', error);
+        console.error('Error in GlobalContextProvider useEffect:', error);
       } finally {
         setLoading(false);
       }
@@ -167,14 +211,11 @@ export const GlobalContextProvider = ({ children }) => {
         setStatements,
         storyOverviews,
         setStoryOverviews,
-        sectionTitles, 
+        sectionTitles,
         setSectionTitles,
-
         currentPage,
         setCurrentPage,
         basePath,
-        // data,
-        // setData,
       }}
     >
       {children}

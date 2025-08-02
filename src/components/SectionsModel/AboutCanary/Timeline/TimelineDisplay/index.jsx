@@ -2,52 +2,57 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { MdCircle } from 'react-icons/md';
 import { BiSolidRightArrow } from 'react-icons/bi';
+import { useContext } from 'react';
 import TextDisplay from '../../../../core/TextDisplay';
 
 // Main section component
-const TimelineDisplay = ({ listData }) => {
+const TimelineDisplay = ({ title, listData }) => {
+
+  const formatDate = (date) => {
+    if (!date || !(date instanceof Date) || isNaN(date)) {
+      return 'N/A';
+    }
+    return date.toLocaleDateString('vi-VN', {
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
+
   return (
     <div>
       <TextDisplay
-        value="Lịch sử hoạt động"
+        value={title || 'Lịch sử hoạt động'}
         className="w-full pt-20 font-bold text-[2.5rem] text-primary-title text-center"
       />
       <ActivityHistoryList>
-        {listData.map((activity, index) => (
-          <ActivityHistoryListItem
-            key={`activity_${index}`}
-            startDate={new Date(
-              activity?.started_time?.seconds * 1000 +
-                activity?.started_time?.nanoseconds / 1000
-            ).toLocaleDateString('en-US', {
-              month: '2-digit',
-              year: 'numeric',
-            })}
-            endDate={new Date(
-              activity?.ended_time?.seconds * 1000 +
-                activity?.ended_time?.nanoseconds / 1000
-            ).toLocaleDateString('en-US', {
-              month: '2-digit',
-              year: 'numeric',
-            })}
-            imageUrl1={activity.image1}
-            imageUrl2={activity.image2}
-            description={activity.text}
-          />
-        ))}
+        {listData && listData.length > 0 ? (
+          listData.map((activity, index) => (
+            <ActivityHistoryListItem
+              key={`activity_${index}`}
+              startDate={formatDate(activity.started_time)}
+              endDate={formatDate(activity.ended_time)}
+              imageUrl1={activity.image1 || 'https://via.placeholder.com/800/600'}
+              imageUrl2={activity.image2 || 'https://via.placeholder.com/800/600'}
+              description={activity.text || ''}
+            />
+          ))
+        ) : (
+          <div className="text-center text-primary-paragraph">Không có dữ liệu lịch sử hoạt động.</div>
+        )}
       </ActivityHistoryList>
     </div>
   );
 };
 
 TimelineDisplay.propTypes = {
+  title: PropTypes.string,
   listData: PropTypes.arrayOf(
     PropTypes.shape({
-      started_time: PropTypes.object.isRequired,
-      ended_time: PropTypes.object.isRequired,
-      image1: PropTypes.string.isRequired,
-      image2: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
+      started_time: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.oneOf([null])]),
+      ended_time: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.oneOf([null])]),
+      image1: PropTypes.string,
+      image2: PropTypes.string,
+      text: PropTypes.string,
     })
   ).isRequired,
 };
@@ -63,7 +68,7 @@ function ActivityHistoryListItem({
   description,
 }) {
   return (
-    <div className="hidden" data-item>
+    <div className="hidden" data-item aria-hidden="true">
       {startDate} {endDate} {imageUrl1} {imageUrl2} {description}
     </div>
   );
@@ -119,9 +124,9 @@ function ActivityHistoryList({ children }) {
             {/* Text Block */}
             <div className="w-1/2 h-full px-4">
               <div className={`w-136 h-full ${isEven ? '' : 'float-right'}`}>
-                <div className="w-83 flex justify-between text-[1.6rem] font-bold text-primary-title">
+                <div className="w-full flex justify-between text-[1.6rem] font-bold text-primary-title">
                   <div>{startDate}</div>
-                  <div className="w-0 flex justify-center">{endDate}</div>
+                  <div className="w-83 flex justify-center">{endDate}</div>
                 </div>
                 <div className="flex items-center py-2">
                   <MdCircle className="w-5 h-5 mr-0.5 text-secondary" />
